@@ -1,3 +1,4 @@
+import requests
 from nakuru.entities.components import *
 from nakuru import (
     GroupMessage,
@@ -9,56 +10,42 @@ from cores.qqbot.global_object import (
     CommandResult
 )
 
-'''
-注意改插件名噢！格式：XXXPlugin 或 Main
-小提示：把此模板仓库 fork 之后 clone 到机器人文件夹下的 addons/plugins/ 目录下，然后用 Pycharm/VSC 等工具打开可获更棒的编程体验（自动补全等）
-'''
-class HelloWorldPlugin:
+
+class Main:
     """
     初始化函数, 可以选择直接pass
     """
     def __init__(self) -> None:
-        print("hello, world!")
+        print("ATRI")
 
-    """
-    机器人程序会调用此函数。
-    返回规范: bool: 插件是否响应该消息 (所有的消息均会调用每一个载入的插件, 如果不响应, 则应返回 False)
-             Tuple: Non e或者长度为 3 的元组。如果不响应, 返回 None； 如果响应, 第 1 个参数为指令是否调用成功, 第 2 个参数为返回的消息链列表, 第 3 个参数为指令名称
-    例子：一个名为"yuanshen"的插件；当接收到消息为“原神 可莉”, 如果不想要处理此消息，则返回False, None；如果想要处理，但是执行失败了，返回True, tuple([False, "请求失败。", "yuanshen"]) ；执行成功了，返回True, tuple([True, "结果文本", "yuanshen"])
-    """
-    def run(self, ame: AstrMessageEvent):
-        if ame.message_str == "helloworld":
-            # return True, tuple([True, "Hello World!!", "helloworld"])
-            return CommandResult(
-                hit=True,
-                success=True,
-                message_chain=[Plain("Hello World!!")],
-                command_name="helloworld"
-            )
-        else:
-            return CommandResult(
-                hit=False,
-                success=False,
-                message_chain=None,
-            )
-    """
-    插件元信息。
-    当用户输入 plugin v 插件名称 时，会调用此函数，返回帮助信息。
-    返回参数要求(必填)：dict{
-        "name": str, # 插件名称
-        "desc": str, # 插件简短描述
-        "help": str, # 插件帮助信息
-        "version": str, # 插件版本
-        "author": str, # 插件作者
-        "repo": str, # 插件仓库地址 [ 可选 ]
-        "homepage": str, # 插件主页  [ 可选 ]
-    }
-    """        
+    async def run(self, ame: AstrMessageEvent):
+        msg = ame.message_str
+        url = f"http://api.soulter.top/atriproj/conversation?prompt={msg}&sid={ame.session_id}&json=true"
+        resp = requests.get(url)
+        #{
+        #     "session_id": "107.172.132.177",
+        #     "result": "初次见面夏生先生！我是亚托莉，超高兴认识你！我会一直陪伴你的，因为我是高性能的嘛！",
+        #     "translated_result": "はじめまして夏生さん！私はアトリーです。お会いできて嬉しいです！私はずっとあなたと一緒にいます。私は高性能だからです！",
+        #     "audio_url": "http://api.soulter.top/atriproj/audio_file?filename=tmp/2024-03-05-13-31-20.wav",
+        #     "context_len": 4,
+        #     "usage_tokens": 11832
+        # }
+        # await ame.gocq_platform.send_msg(ame.message_obj, [
+            
+        # ])
+        return CommandResult(
+            hit=True,
+            success=True,
+            message_chain=[Record(file=resp.json()['audio_url']),],
+            command_name='atri'
+        )
+
+    
     def info(self):
         return {
-            "name": "helloworld",
-            "desc": "测试插件",
-            "help": "测试插件, 回复 helloworld 即可触发",
-            "version": "v1.2",
+            "name": "astrbot-plugin-atri",
+            "desc": "笨蛋萝卜子",
+            "help": "",
+            "version": "v1.0",
             "author": "Soulter"
         }
